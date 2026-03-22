@@ -6,6 +6,11 @@ Built with Python, Playwright, and GitHub Actions.
 
 ---
 
+## Who is this for?
+- Freshers and final year students applying for first job in India
+- Anyone tired of manually applying on Naukri, Internshala, Indeed
+- Developers who want to learn Playwright + GitHub Actions automation
+
 ## ✨ Features
 
 - 🔍 Searches multiple job keywords across multiple locations
