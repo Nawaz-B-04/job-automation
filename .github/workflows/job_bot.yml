@@ -1,0 +1,46 @@
+name: Job Application Bot
+
+on:
+  schedule:
+    - cron: '30 3 * * *'   # 9:00 AM IST
+    - cron: '30 7 * * *'   # 1:00 PM IST
+    - cron: '30 13 * * *'  # 7:00 PM IST
+  workflow_dispatch:        # manual trigger from GitHub UI
+
+jobs:
+  apply-jobs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: Run job bot
+        env:
+          NAUKRI_EMAIL: ${{ secrets.NAUKRI_EMAIL }}
+          NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
+          INTERNSHALA_EMAIL: ${{ secrets.INTERNSHALA_EMAIL }}
+          INTERNSHALA_PASSWORD: ${{ secrets.INTERNSHALA_PASSWORD }}
+          INDEED_EMAIL: ${{ secrets.INDEED_EMAIL }}
+        run: python main.py
+
+      - name: Upload application log
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: applied-jobs-db
+          path: |
+            applied_jobs.db
+            applied_*.csv
+          retention-days: 30

@@ -4,6 +4,7 @@ import os
 import yaml
 from playwright.async_api import async_playwright, TimeoutError as PWTimeout
 from utils.logger import already_applied, log_applied
+from utils.browser import get_browser_options
 
 with open("config.yaml") as f:
     cfg = yaml.safe_load(f)
@@ -156,7 +157,7 @@ async def apply_to_job(page, job_id, title, company, location):
 async def run(email=None):
     count = 0
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)
+        browser = await p.chromium.launch(**get_browser_options())
         context = await browser.new_context(
             viewport={"width": 1280, "height": 800},
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
