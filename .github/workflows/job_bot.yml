@@ -36,7 +36,7 @@ jobs:
         run: python main.py
 
       - name: Upload application log
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: applied-jobs-db
