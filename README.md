@@ -1,123 +1,176 @@
-# Job Application Bot
-**Platforms: Naukri · Internshala · Indeed**
-Built for: Nawazish Majid Bidiwale
+# 🤖 Job Application Bot
+
+An automated job application bot that applies to jobs on **Naukri**, **Internshala**, and **Indeed** — runs 3x daily on GitHub Actions (no laptop needed).
+
+Built with Python, Playwright, and GitHub Actions.
 
 ---
 
-## 📁 Project Structure
+## ✨ Features
+
+- 🔍 Searches multiple job keywords across multiple locations
+- ✅ Auto-applies via Easy Apply / Quick Apply on each platform
+- 🚫 Tracks applied jobs in SQLite — never applies to the same job twice
+- ☁️ Runs on GitHub Actions — works even when your laptop is off
+- 🔐 Credentials stored as GitHub Secrets — never hardcoded
+- 📊 Exports application history to CSV after every run
+- ⚙️ Fully configurable via `config.yaml` — no code changes needed
+
+---
+
+## 🏗️ Project Structure
 
 ```
-job_bot/
-├── main.py                  ← Run this to start all bots
-├── config.yaml              ← Keywords, filters, your info
-├── .env                     ← Passwords (fill this, never share)
+job-bot/
+├── main.py                  # Orchestrator — runs all platform bots
+├── config.yaml              # Keywords, filters, applicant info
+├── .env.example             # Credentials template (copy to .env locally)
 ├── requirements.txt
-├── stats.py                 ← View stats + export CSV
-├── applied_jobs.db          ← Auto-created (tracks all applications)
-├── resume/
-│   └── Nawazish_Bidiwale_Fullstack.pdf   ← PUT RESUME HERE
 ├── platforms/
-│   ├── naukri.py
-│   ├── internshala.py
-│   └── indeed.py
-└── utils/
-    └── logger.py
+│   ├── naukri.py            # Naukri bot
+│   ├── internshala.py       # Internshala bot
+│   └── indeed.py            # Indeed bot
+├── utils/
+│   ├── logger.py            # SQLite tracking + CSV export
+│   └── browser.py           # Headless/headed mode switcher
+└── .github/
+    └── workflows/
+        └── job_bot.yml      # GitHub Actions schedule (3x daily)
 ```
 
 ---
 
-## ⚙️ One-Time Setup
+## ⚙️ Local Setup
 
-### 1. Install dependencies
+### 1. Clone the repo
+```bash
+git clone https://github.com/Nawaz-B-04/job-bot.git
+cd job-bot
+```
+
+### 2. Create virtual environment
+```bash
+python -m venv .venv
+.venv\Scripts\activate       # Windows
+source .venv/bin/activate    # Mac/Linux
+```
+
+### 3. Install dependencies
 ```bash
 pip install -r requirements.txt
 playwright install chromium
 ```
 
-### 2. Add your resume
-Copy your PDF into the `resume/` folder. Name must match `config.yaml`:
-```
-resume/Nawazish_Bidiwale_Fullstack.pdf
-```
-
-### 3. Fill in your passwords
-Open `.env` and add your passwords:
-```
-NAUKRI_PASSWORD=your_naukri_password
-INTERNSHALA_PASSWORD=your_internshala_password
-```
-
----
-
-## ▶️ Running the Bot
-
-### Run all platforms
+### 4. Set up credentials
 ```bash
+cp .env.example .env
+```
+Open `.env` and fill in your credentials:
+```
+NAUKRI_EMAIL=your@email.com
+NAUKRI_PASSWORD=yourpassword
+INTERNSHALA_EMAIL=your@email.com
+INTERNSHALA_PASSWORD=yourpassword
+INDEED_EMAIL=your@email.com
+```
+
+### 5. Add your resume
+Drop your resume PDF in the `resume/` folder and update the path in `config.yaml`:
+```yaml
+resume_path: "./resume/your_resume.pdf"
+```
+
+### 6. Configure your job preferences
+Edit `config.yaml`:
+
+### 7. Run
+```bash
+# Run all platforms
 python main.py
-```
 
-### Run one platform only
-```bash
+# Run one platform only
 python main.py --platform naukri
 python main.py --platform internshala
 python main.py --platform indeed
 ```
 
-A browser window opens for each platform. Don't close it — monitor what's happening.
-
 ---
 
-## 📊 Check Your Applications
+## ☁️ GitHub Actions Setup (Run in Cloud)
 
-```bash
-python stats.py
-```
+This bot runs automatically 3x/day on GitHub's servers — no laptop needed.
 
-Prints total applications per platform and exports a dated CSV file.
+### 1. Fork this repo
 
----
+### 2. Add your credentials as GitHub Secrets
+Go to your repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
 
-## ⚙️ Customize (config.yaml)
-
-| Setting | What it does |
+| Secret Name | Value |
 |---|---|
-| `keywords` | Job titles to search for |
-| `filters.locations` | Cities to target |
-| `limits.max_per_platform` | Max applications per platform per run |
-| `limits.delay_between_jobs` | Seconds between each apply (keep ≥ 5) |
-| `cover_note` | Your cover letter text |
-| `applicant.expected_ctc` | Expected salary in INR |
+| `NAUKRI_EMAIL` | your naukri email |
+| `NAUKRI_PASSWORD` | your naukri password |
+| `INTERNSHALA_EMAIL` | your internshala email |
+| `INTERNSHALA_PASSWORD` | your internshala password |
+| `INDEED_EMAIL` | your indeed email |
+
+### 3. Enable Actions
+Go to the **Actions** tab in your repo → enable workflows if prompted.
+
+### 4. Test manually
+Actions tab → **Job Application Bot** → **Run workflow**
+
+The bot now runs automatically at:
+- 🕘 9:00 AM IST
+- 🕐 1:00 PM IST
+- 🕖 7:00 PM IST
 
 ---
 
-## ⏰ Schedule Daily (Windows)
+## 📊 Viewing Results
 
-1. Open **Task Scheduler** → Create Basic Task
-2. Trigger: Daily at 9:00 AM
-3. Action: Start a Program
-   - Program: `python`
-   - Arguments: `main.py`
-   - Start in: `C:\path\to\job_bot`
+After each run, go to:
 
----
+**Actions tab → latest run → scroll to bottom → download `applied-jobs-db` artifact**
 
-## ⚠️ Important Notes
-
-- Keep `headless=False` while testing so you can watch and intervene
-- **Naukri** — Works best. If CAPTCHA appears, solve manually
-- **Internshala** — Most reliable, very bot-friendly
-- **Indeed** — Easy Apply only; jobs with external apply links are skipped
-- **LinkedIn** — Use **LazyApply** Chrome extension instead of a bot
-- **Cutshort / Foundit** — Apply manually; they use skill-match AI so a bot undermines the point
-- Don't exceed 30 applications/platform/day to avoid account flags
+It contains:
+- `applied_jobs.db` — open with [DB Browser for SQLite](https://sqlitebrowser.org)
+- `applied_YYYYMMDD.csv` — open in Excel
 
 ---
 
-## 🔁 Recommended Daily Workflow
+## 🔒 Security
 
-| Time | Action |
+- Credentials are stored in **GitHub Secrets** (encrypted, never visible in logs or code)
+- `.env` is in `.gitignore` — never committed
+- Secrets are injected as environment variables at runtime only
+
+---
+
+## 🧰 Tech Stack
+
+| Tool | Purpose |
 |---|---|
-| 9:00 AM | `python main.py` — bot runs all 3 platforms |
-| 9:30 AM | `python stats.py` — check what was applied |
-| Evening | Manually check Cutshort + Foundit (10 min) |
-| Evening | LazyApply on LinkedIn (run the extension) |
+| **Python** | Core language |
+| **Playwright** | Browser automation |
+| **asyncio** | Async/concurrent execution |
+| **PyYAML** | Config file parsing |
+| **python-dotenv** | Local credential loading |
+| **SQLite** | Deduplication tracking |
+| **GitHub Actions** | Cloud scheduling (CI/CD) |
+
+---
+
+## ⚠️ Disclaimer
+
+This tool is for personal use to automate your own job applications. Use responsibly and respect each platform's terms of service. Keep daily application limits reasonable (≤ 30/platform) to avoid account flags.
+
+---
+
+## 🤝 Contributing
+
+PRs welcome! Some ideas:
+- Add more platforms (Wellfound, Unstop)
+- Add Telegram/email notification on successful apply
+- Build a dashboard UI for viewing applications
+
+---
