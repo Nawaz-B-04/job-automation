@@ -15,12 +15,34 @@ Built with Python, Playwright, and GitHub Actions.
 - 🔐 Credentials stored as GitHub Secrets — never hardcoded
 - 📊 Exports application history to CSV after every run
 - ⚙️ Fully configurable via `config.yaml` — no code changes needed
+# 🤖 Job Application Bot
+
+An automated job application bot that applies to jobs on **Naukri**, **Internshala**, and **Indeed** — runs 3x daily on GitHub Actions (no laptop needed).
+
+Built with Python, Playwright, and GitHub Actions.
+
+---
+
+## ✨ Features
+
+- 🔍 Searches multiple job keywords across multiple locations
+- ✅ Auto-applies via Easy Apply / Quick Apply on each platform
+- 🚫 Tracks applied jobs in SQLite — never applies to the same job twice
+- ☁️ Runs on GitHub Actions — works even when your laptop is off
+- 🔐 Credentials stored as GitHub Secrets — never hardcoded
+- 📊 Exports application history to CSV after every run
+- ⚙️ Fully configurable via `config.yaml` — no code changes needed
 
 ---
 
 ## 🏗️ Project Structure
+## 🏗️ Project Structure
 
 ```
+job-bot/
+├── main.py                  # Orchestrator — runs all platform bots
+├── config.yaml              # Keywords, filters, applicant info
+├── .env.example             # Credentials template (copy to .env locally)
 job-bot/
 ├── main.py                  # Orchestrator — runs all platform bots
 ├── config.yaml              # Keywords, filters, applicant info
@@ -36,12 +58,36 @@ job-bot/
 └── .github/
     └── workflows/
         └── job_bot.yml      # GitHub Actions schedule (3x daily)
+│   ├── naukri.py            # Naukri bot
+│   ├── internshala.py       # Internshala bot
+│   └── indeed.py            # Indeed bot
+├── utils/
+│   ├── logger.py            # SQLite tracking + CSV export
+│   └── browser.py           # Headless/headed mode switcher
+└── .github/
+    └── workflows/
+        └── job_bot.yml      # GitHub Actions schedule (3x daily)
 ```
 
 ---
 
 ## ⚙️ Local Setup
+## ⚙️ Local Setup
 
+### 1. Clone the repo
+```bash
+git clone https://github.com/Nawaz-B-04/job-bot.git
+cd job-bot
+```
+
+### 2. Create virtual environment
+```bash
+python -m venv .venv
+.venv\Scripts\activate       # Windows
+source .venv/bin/activate    # Mac/Linux
+```
+
+### 3. Install dependencies
 ### 1. Clone the repo
 ```bash
 git clone https://github.com/Nawaz-B-04/job-bot.git
@@ -86,8 +132,10 @@ Edit `config.yaml`:
 ### 7. Run
 ```bash
 # Run all platforms
+# Run all platforms
 python main.py
 
+# Run one platform only
 # Run one platform only
 python main.py --platform naukri
 python main.py --platform internshala
